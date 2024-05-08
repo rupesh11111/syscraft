@@ -1,0 +1,102 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Http\Controllers\Controller;
+use App\Models\Product;
+use App\Models\Role;
+use Illuminate\Http\Request;
+use App\Models\User;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+
+class AuthController extends Controller
+{
+
+    public function dashboard()
+    {
+        $auth = Auth::user();
+        if ($auth->role->name == 'admin') {
+            return view('adminDashboard');
+        }
+        if ($auth->role->name == 'customer') {
+            $data['products'] = Product::paginate(20);
+            return view('customerDashboard',$data);
+        }
+    }
+
+    public function showLoginForm()
+    {
+        return view('login');
+    }
+
+    public function login(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|exists:users,email',
+            'password' => 'required|min:8',
+        ]);
+
+        if (auth()->attempt(['email' => $request->email, 'password' => $request->password])) {
+            return response()->json(['success' => true, 'message' => "Successfully Logged In"]);
+        } else {
+            return response()->json(['success' => false, 'message' => "Invalid Credentials"]);
+        }
+    }
+
+    public function showRegistrationForm()
+    {
+        $roles = Role::get();
+        return view('register');
+    }
+
+    public function register(Request $request)
+    {
+
+
+        $request->validate([
+            'role' => 'nullable|in:customer,vendor|exists:roles,name',
+            'name' => 'nullable|string',
+            'address' => 'nullable|string',
+            'contact' => 'nullable|string|min:10|max:13',
+            'email' => 'nullable|email|unique:users,email',
+            'username' => 'nullable|unique:users,username',
+            'password' => 'nullable|min:8',
+            // 'profile_picture' => 'nullable|mimes:png,jpg,img,jpeg,webp',
+            'dob' => 'nullable|date_format:Y-m-d',
+        ]);
+
+        DB::beginTransaction();
+
+        request()->merge(['role_id' => Role::whereName(request('role'))->value('id')]);
+
+        $user = User::create(request()->only('name', 'address', 'role_id', 'contact', 'email', 'username', 'password', 'dob'));
+
+        if (request()->hasFile('profile_picture')) {
+            $file = request('profile_picture');
+            $extension = null;
+            if (is_file($file)) {
+                $extension = $file->getClientOriginalExtension();
+            } else if (filter_var($file, FILTER_VALIDATE_URL)) {
+                $file_info = pathinfo($file);
+                $extension = $file_info['extension'];
+            } else {
+                return false;
+            }
+            $fileName = random() . '.' . $extension;
+            Storage::disk('local')->put('public/user_profile/' . $fileName, file_get_contents(request()->file('profile_picture')));
+            $user->profile_picture = $fileName;
+        }
+
+        $user->save();
+        DB::commit();
+        return response()->json(['success' => true]);
+    }
+
+    public function logout()
+    {
+        Auth::logout();
+        return redirect('/login');
+    }
+}
