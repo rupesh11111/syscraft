@@ -20,7 +20,7 @@
                         $('.append').html(response.data)
                         mainDataTable();
                     },
-                    error: function(xhr, status, error) {
+                    error: function (xhr, status, error) {
                         toastr.error(xhr.responseJSON.message);
                     }
                 });

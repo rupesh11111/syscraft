@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Mail\WelcomeEmail;
 use App\Models\Product;
 use App\Models\Role;
 use Illuminate\Http\Request;
@@ -10,6 +11,7 @@ use App\Models\User;
 use Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 
 class AuthController extends Controller
@@ -48,7 +50,6 @@ class AuthController extends Controller
 
     public function showRegistrationForm()
     {
-        $roles = Role::get();
         return view('register');
     }
 
@@ -87,9 +88,12 @@ class AuthController extends Controller
             Storage::disk('local')->put('public/user_profile/' . $fileName, file_get_contents(request()->file('profile_picture')));
             $user->profile_picture = $fileName;
         }
-
         $user->save();
+
         DB::commit();
+
+        Mail::to($user->email)->send(new WelcomeEmail($user));
+
         return response()->json(['success' => true]);
     }
 
