@@ -41,7 +41,7 @@
                 <div class="text-right">
                     <h4 id="total">Total: ${{ $total }}</h4>
                     <div id="checkout-buttons">
-                    <button id="checkout" class="btn btn-primary">Proceed to Checkout</button>
+                    <button id="checkout" class="btn btn-primary" {{empty($cartItems) ? 'disabled' : ''}}>Proceed to Checkout</button>
                 </div>
             </div>
         </div>
