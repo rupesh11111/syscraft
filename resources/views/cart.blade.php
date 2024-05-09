@@ -20,7 +20,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach ($cartItems as $cartItem)
+                        @foreach ($cartItems ?? [] as $cartItem)
                             <tr class="cartItem">
                                 <td>{{ $cartItem->product->name }}</td>
                                 <td>${{ $cartItem->product->price }}</td>
@@ -59,7 +59,7 @@
             $('#checkout').on('click', function() {
                 // $('#modal').modal('show');
                 $('#checkout-buttons').html("<button id='pay-now' class='btn btn-primary'>Pay Now</button>"
-                + "<button id='cod' data-link='orders/{!! $cart->id !!}' class='btn btn-primary'>Cash On Deilvery</button>")
+                + "<button id='cod' data-link='orders/{!! $cart?->id !!}' class='btn btn-primary'>Cash On Deilvery</button>")
             })
 
             $('body').on('click','#cod', function () {
