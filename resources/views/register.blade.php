@@ -61,30 +61,97 @@
 @push('script')
     <script>
         $(document).ready(function() {
+
+            $("#registrationForm").validate({
+                rules: {
+                    name: {
+                        required: true
+                    },
+                    address: {
+                        required: true
+                    },
+                    contact: {
+                        required: true,
+                        digits: true, // Assuming contact is a numeric value
+                        minlength: 10, // Adjust as needed
+                        maxlength: 15 // Adjust as needed
+                    },
+                    email: {
+                        required: true,
+                        email: true
+                    },
+                    username: {
+                        required: true
+                    },
+                    password: {
+                        required: true,
+                        minlength: 8
+                    },
+                    profile_picture: {
+                        required: false,
+                    },
+                    dob: {
+                        required: true,
+                        date: true // Assuming dob is a date
+                    }
+                },
+                messages: {
+                    name: {
+                        required: "Please enter your name"
+                    },
+                    address: {
+                        required: "Please enter your address"
+                    },
+                    contact: {
+                        required: "Please enter your contact number",
+                        digits: "Please enter only digits",
+                        minlength: "Contact number must be at least 10 digits",
+                        maxlength: "Contact number cannot exceed 15 digits"
+                    },
+                    email: {
+                        required: "Please enter your email",
+                        email: "Please enter a valid email address"
+                    },
+                    username: {
+                        required: "Please enter your username"
+                    },
+                    password: {
+                        required: "Please enter your password",
+                        minlength: "Password must be at least 8 characters long"
+                    },
+                    profile_picture: {
+                        required: "Please provide a profile picture",
+                    },
+                    dob: {
+                        required: "Please enter your date of birth",
+                        date: "Please enter a valid date"
+                    }
+                }
+            });
             $("#registrationForm").submit(function(event) {
                 event.preventDefault();
-
-                // Create a FormData object
-                var formData = new FormData($(this)[0]);
-
-                $.ajax({
-                    type: "POST",
-                    url: "register", // Specify your PHP file here to handle registration
-                    data: formData,
-                    processData: false, // Don't process the files
-                    contentType: false, // Set content type to false as FormData will handle it
-                    success: function(response) {
-                        if (response.success) {
-                            window.location.href = "/";
-                            toastr.success(response.message);
-                        } else {
-                            toastr.error(response.message);
+                if ($(this).valid()) {
+                    // Create a FormData object
+                    var formData = new FormData($(this)[0]);
+                    $.ajax({
+                        type: "POST",
+                        url: "register", // Specify your PHP file here to handle registration
+                        data: formData,
+                        processData: false, // Don't process the files
+                        contentType: false, // Set content type to false as FormData will handle it
+                        success: function(response) {
+                            if (response.success) {
+                                window.location.href = "/";
+                                toastr.success(response.message);
+                            } else {
+                                toastr.error(response.message);
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            toastr.error(xhr.responseJSON.message);
                         }
-                    },
-                    error: function(xhr, status, error) {
-                        toastr.error(xhr.responseJSON.message);
-                    }
-                });
+                    });
+                }
             });
         });
     </script>
