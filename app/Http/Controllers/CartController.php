@@ -11,12 +11,13 @@ use Illuminate\Support\Facades\DB;
 class CartController extends Controller
 {
 
-    public function index() {
+    public function index()
+    {
         $auth = Auth::user();
         $data['cart'] = $auth->cart;
         $data['cartItems'] = $cartItems = $auth->cart->cart_items()->with('product')->get()->append('total_price');
         $data['total'] = collect($cartItems)->sum('total_price');
-        return view('cart',$data);
+        return view('cart', $data);
     }
 
     public function addToCart()
@@ -30,7 +31,7 @@ class CartController extends Controller
             $cart = Cart::whereUserId(Auth::id())->first();
 
             DB::beginTransaction();
-            
+
             if (!$cart) {
                 $cart = Cart::create([
                     'user_id' => Auth::id(),
@@ -46,9 +47,9 @@ class CartController extends Controller
             $cartItem->save();
 
             $data['cart_count'] = CartItem::whereHas('cart', fn ($q) => $q->whereUserId(Auth::id()))->count();
-            
+
             DB::commit();
-            
+
             return response()->json([
                 'status' => true,
                 'message' => "Item added Successfully",
@@ -63,23 +64,36 @@ class CartController extends Controller
         }
     }
 
-    public function destroy($itemCartId) {
-        $data = [
-            'total' => 0
-        ];
+    public function destroy($itemCartId)
+    {
+        try {
 
-        $cartItem = CartItem::whereId($itemCartId)->first();
+            DB::beginTransaction();
+            $data = [
+                'total' => 0
+            ];
 
-        $cartItem->delete();
+            $cartItem = CartItem::whereId($itemCartId)->first();
 
-        if($cartItem) {
-            $cartItems = CartItem::whereCartId($cartItem->cart_id)->with('product')->get()->append('total_price');
-            $data['total'] = collect($cartItems)->sum('total_price');    
+            $cartItem->delete();
+
+            if ($cartItem) {
+                $cartItems = CartItem::whereCartId($cartItem->cart_id)->with('product')->get()->append('total_price');
+                $data['total'] = collect($cartItems)->sum('total_price');
+            }
+            
+            DB::commit();
+            return response()->json([
+                'status' => true,
+                'message' => 'Item removed from cart',
+                'data' => $data
+            ]);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'status' => false,
+                'message' => $e->getMessage()
+            ], 400);
         }
-        return response()->json([
-            'status' => true,
-            'message' => 'Item removed from cart',
-            'data' => $data
-        ]);
     }
 }

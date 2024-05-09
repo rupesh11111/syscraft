@@ -11,12 +11,15 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+
 class OrderController extends Controller
 {
     public function store(Request $request, $id)
     {
 
         try {
+
+            DB::beginTransaction();
             request()->merge(['cart_id' => $id]);
 
             $request->validate([
@@ -55,6 +58,7 @@ class OrderController extends Controller
                 'status' => 'Paid',
             ]);
 
+            DB::commit();
             return response()->json([
                 'status' => true,
                 'data' => [
@@ -65,7 +69,7 @@ class OrderController extends Controller
             DB::rollback();
             return response()->json([
                 'status' => false,
-                'message' => $e->getMessage() 
+                'message' => $e->getMessage()
             ]);
         }
     }

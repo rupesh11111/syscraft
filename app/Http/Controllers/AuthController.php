@@ -23,7 +23,7 @@ class AuthController extends Controller
         if ($auth->role->name == 'admin') {
             return view('adminDashboard');
         }
-        if (in_array($auth->role->name , ['customer','vendor'])) {
+        if (in_array($auth->role->name, ['customer', 'vendor'])) {
             $data['products'] = Product::paginate(20);
             return view('customerDashboard', $data);
         }
@@ -55,46 +55,54 @@ class AuthController extends Controller
 
     public function register(Request $request)
     {
-        $request->validate([
-            'role' => 'nullable|in:customer,vendor|exists:roles,name',
-            'name' => 'nullable|string',
-            'address' => 'nullable|string',
-            'contact' => 'nullable|string|min:10|max:13',
-            'email' => 'nullable|email|unique:users,email',
-            'username' => 'nullable|unique:users,username',
-            'password' => 'nullable|min:8',
-            // 'profile_picture' => 'nullable|mimes:png,jpg,img,jpeg,webp',
-            'dob' => 'nullable|date_format:Y-m-d',
-        ]);
+        try {
+            $request->validate([
+                'role' => 'nullable|in:customer,vendor|exists:roles,name',
+                'name' => 'nullable|string',
+                'address' => 'nullable|string',
+                'contact' => 'nullable|string|min:10|max:13',
+                'email' => 'nullable|email|unique:users,email',
+                'username' => 'nullable|unique:users,username',
+                'password' => 'nullable|min:8',
+                // 'profile_picture' => 'nullable|mimes:png,jpg,img,jpeg,webp',
+                'dob' => 'nullable|date_format:Y-m-d',
+            ]);
 
-        DB::beginTransaction();
+            DB::beginTransaction();
 
-        request()->merge(['role_id' => Role::whereName(request('role'))->value('id')]);
+            request()->merge(['role_id' => Role::whereName(request('role'))->value('id')]);
 
-        $user = User::create(request()->only('name', 'address', 'role_id', 'contact', 'email', 'username', 'password', 'dob'));
+            $user = User::create(request()->only('name', 'address', 'role_id', 'contact', 'email', 'username', 'password', 'dob'));
 
-        if (request()->hasFile('profile_picture')) {
-            $file = request('profile_picture');
-            $extension = null;
-            if (is_file($file)) {
-                $extension = $file->getClientOriginalExtension();
-            } else if (filter_var($file, FILTER_VALIDATE_URL)) {
-                $file_info = pathinfo($file);
-                $extension = $file_info['extension'];
-            } else {
-                return false;
+            if (request()->hasFile('profile_picture')) {
+                $file = request('profile_picture');
+                $extension = null;
+                if (is_file($file)) {
+                    $extension = $file->getClientOriginalExtension();
+                } else if (filter_var($file, FILTER_VALIDATE_URL)) {
+                    $file_info = pathinfo($file);
+                    $extension = $file_info['extension'];
+                } else {
+                    return false;
+                }
+                $fileName = random() . '.' . $extension;
+                Storage::disk('local')->put('public/user_profile/' . $fileName, file_get_contents(request()->file('profile_picture')));
+                $user->profile_picture = $fileName;
             }
-            $fileName = random() . '.' . $extension;
-            Storage::disk('local')->put('public/user_profile/' . $fileName, file_get_contents(request()->file('profile_picture')));
-            $user->profile_picture = $fileName;
+            $user->save();
+
+            DB::commit();
+
+            Mail::to($user->email)->send(new WelcomeEmail($user));
+
+            return response()->json(['success' => true]);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'status' => false,
+                'message' => $e->getMessage()
+            ], 400);
         }
-        $user->save();
-
-        DB::commit();
-
-        Mail::to($user->email)->send(new WelcomeEmail($user));
-
-        return response()->json(['success' => true]);
     }
 
     public function logout()
@@ -156,10 +164,10 @@ class AuthController extends Controller
             $user->save();
             DB::commit();
             $data['user'] = $user->fresh();
-            return response()->json(['status' => true , 'message' => "Profile Updated Successfully",'data' => $data]);
+            return response()->json(['status' => true, 'message' => "Profile Updated Successfully", 'data' => $data]);
         } catch (Exception $e) {
             DB::commit();
-            return response()->json(['status' => true,'message' => $e->getMessage()],400);
+            return response()->json(['status' => true, 'message' => $e->getMessage()], 400);
         }
     }
 }
