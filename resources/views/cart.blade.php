@@ -88,7 +88,9 @@
                     url: $(this).data('link'),
                     success: function(response) {
                         thisValue.closest('.cartItem').remove();
-                        $('#total').html(`Total: $${response?.data?.total ?? 0}`)
+                        let price = response?.data?.total ?? 0;
+                        $('#total').html(`Total: $${price}`)
+                        if(price == 0)  $('#checkout').prop('disabled', true); // Disables the button when clicked
                         toastr.success(response.message);
                     },
                     error: function(xhr, status, error) {
