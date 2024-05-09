@@ -30,6 +30,7 @@
                 const tableObj = $("#ajaxDataTable").DataTable({
                     processing: false,
                     serverSide: true,
+                    searching: true,
                     cache: true,
                     ajax: {
                         url: $("#ajaxDataTable").data("url"),
@@ -42,6 +43,7 @@
                     },
                     searchDelay: 350,
                     columns: $("#ajaxDataTable").data("columns"),
+
                 });
             }
         });
