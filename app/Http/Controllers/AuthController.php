@@ -7,6 +7,7 @@ use App\Models\Product;
 use App\Models\Role;
 use Illuminate\Http\Request;
 use App\Models\User;
+use Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -22,7 +23,7 @@ class AuthController extends Controller
         }
         if ($auth->role->name == 'customer') {
             $data['products'] = Product::paginate(20);
-            return view('customerDashboard',$data);
+            return view('customerDashboard', $data);
         }
     }
 
@@ -53,8 +54,6 @@ class AuthController extends Controller
 
     public function register(Request $request)
     {
-
-
         $request->validate([
             'role' => 'nullable|in:customer,vendor|exists:roles,name',
             'name' => 'nullable|string',
@@ -98,5 +97,65 @@ class AuthController extends Controller
     {
         Auth::logout();
         return redirect('/login');
+    }
+
+    public function profile()
+    {
+        $data['user'] = Auth::user();
+        return view('profile', $data);
+    }
+
+    public function editProfile()
+    {
+        $data['user'] = Auth::user();
+        return view('editProfile', $data);
+    }
+
+    public function updateProfile(Request $request, $id)
+    {
+        try {
+            DB::beginTransaction();
+            $request->validate([
+                'name' => 'required|string',
+                'address' => 'required|string',
+                'contact' => 'required|string',
+                'email' => "required|email|unique:users,email,$id",
+                'username' => "required|string|unique:users,username,$id",
+                'profile_picture' => 'nullable',
+                'profile_picture_old' => 'nullable|string',
+                'dob' => 'required|string',
+            ]);
+
+            $user = User::find(Auth::id());
+
+            $user->update(request()->only('name', 'address', 'contact', 'email', 'username', 'dob'));
+
+            if (empty(request('profile_picture_old'))) {
+                $user->profile_picture = null;
+            } else if (request()->hasFile('profile_picture')) {
+                $file = request('profile_picture');
+                $extension = null;
+                if (is_file($file)) {
+                    $extension = $file->getClientOriginalExtension();
+                } else if (filter_var($file, FILTER_VALIDATE_URL)) {
+                    $file_info = pathinfo($file);
+                    $extension = $file_info['extension'];
+                } else {
+                    return false;
+                }
+                $fileName = random() . '.' . $extension;
+                Storage::disk('local')->put('public/user_profile/' . $fileName, file_get_contents(request()->file('profile_picture')));
+                $user->profile_picture = $fileName;
+            } else {
+                //
+            }
+            $user->save();
+            DB::commit();
+            $data['user'] = $user->fresh();
+            return response()->json(['status' => true , 'message' => "Profile Updated Successfully",'data' => $data]);
+        } catch (Exception $e) {
+            DB::commit();
+            return response()->json(['status' => true,'message' => $e->getMessage()],400);
+        }
     }
 }

@@ -13,6 +13,7 @@ class CartController extends Controller
 
     public function index() {
         $auth = Auth::user();
+        $data['cart'] = $auth->cart;
         $data['cartItems'] = $cartItems = $auth->cart->cart_items()->with('product')->get()->append('total_price');
         $data['total'] = collect($cartItems)->sum('total_price');
         return view('cart',$data);

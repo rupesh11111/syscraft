@@ -12,12 +12,13 @@ class DatatableController extends Controller
     public function customers()
     {
         if (request('data')) {
-            $data = User::select('id', 'name', 'email')->whereHas('role',fn ($q) => $q->whereName(request('type')))->get();
+            $data = User::select('id', 'name', 'email')->whereHas('role', fn ($q) => $q->whereName('customer'))->get();
             return datatables()->of($data)->make(true);
         }
         $data['url'] = 'customers';
         $data['heading'] = 'Customer';
         $data['subHeading'] = 'List of all customers';
+        $data['tableHeadings'] = ['ID', 'Name', 'Email'];
         $data['url'] = 'customers';
         $data['columns'] = json_encode([
             [
@@ -42,13 +43,14 @@ class DatatableController extends Controller
     public function vendors()
     {
         if (request('data')) {
-            $data = User::select('id', 'name', 'email')->whereHas('role',fn ($q) => $q->whereName(request('type')))->get();
+            $data = User::select('id', 'name', 'email')->whereHas('role', fn ($q) => $q->whereName('vendor'))->get();
             return datatables()->of($data)->make(true);
         }
         $data['url'] = 'customers';
         $data['heading'] = 'Customer';
         $data['subHeading'] = 'List of all customers';
-        $data['url'] = 'customers';
+        $data['tableHeadings'] = ['ID', 'Name', 'Email'];
+        $data['url'] = 'vendors';
         $data['columns'] = json_encode([
             [
                 "data" => "id",
@@ -72,22 +74,30 @@ class DatatableController extends Controller
     public function products()
     {
         if (request('data')) {
-            $data = Product::select('id', 'name', 'email')->get();
+            $data = Product::select('id', 'name', 'price', 'image')->get();
             return datatables()->of($data)->make(true);
         }
         $data['url'] = 'products';
+        $data['tableHeadings'] = ['ID', 'Image', 'Name', 'Price'];
         $data['columns'] = json_encode([
             [
                 "data" => "id",
                 "name" => "id",
             ],
             [
+                "data" => "image",
+                "name" => "image",
+                "render" => function ($data, $type, $full, $meta) {
+                    return 'rupesh';
+                }
+            ],
+            [
                 "data" => "name",
                 "name" => "name",
             ],
             [
-                "data" => "email",
-                "name" => "email",
+                "data" => "price",
+                "name" => "price",
             ],
         ]);
         return response()->json([
@@ -99,16 +109,18 @@ class DatatableController extends Controller
     public function orders()
     {
         if (request('data')) {
-            $data = Order::select('id', 'name', 'email')->get();
+            $data = Order::select('id', 'name', 'email')->with('user')->get();
             return datatables()->of($data)->make(true);
         }
-        $data['url'] = 'products';
+        $data['tableHeadings'] = ['ID', 'Name', 'Email'];
+
+        $data['url'] = 'orders';
         $data['columns'] = json_encode([
             [
                 "data" => "id",
                 "name" => "id",
             ],
-            [
+            [ 
                 "data" => "name",
                 "name" => "name",
             ],
@@ -129,7 +141,9 @@ class DatatableController extends Controller
             $data = Order::select('id', 'name', 'email')->get();
             return datatables()->of($data)->make(true);
         }
-        $data['url'] = 'products';
+        $data['tableHeadings'] = ['ID', 'Name', 'Email'];
+
+        $data['url'] = 'transactions';
         $data['columns'] = json_encode([
             [
                 "data" => "id",
@@ -140,7 +154,7 @@ class DatatableController extends Controller
                 "name" => "name",
             ],
             [
-                "data" => "email",
+                "data" => "Price",
                 "name" => "email",
             ],
         ]);
@@ -149,5 +163,4 @@ class DatatableController extends Controller
             'data' => view('table', $data)->render()
         ]);
     }
-
 }

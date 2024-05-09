@@ -51,6 +51,10 @@ class User extends Authenticatable
         ];
     }
 
+    public function getProfilePictureAttribute($value) {
+        return url('/') . '/storage/user_profile/' . $value;
+    }
+
     public function role() {
         return $this->belongsTo(Role::class);
     }

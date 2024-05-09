@@ -7,9 +7,9 @@
 <table id="ajaxDataTable" data-columns="{{$columns ?? []}}" data-url="{{$url ?? 'customers'}}?data=1" class="table table-bordered">
     <thead>
         <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Email</th>
+            @foreach($tableHeadings as $tableHeading)
+            <th>{{$tableHeading}}</th>
+            @endforeach
         </tr>
     </thead>
 </table>

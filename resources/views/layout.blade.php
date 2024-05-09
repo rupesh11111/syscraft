@@ -54,6 +54,7 @@
                                 </a>
                                 <ul class="dropdown-menu" role="menu">
                                     <li>
+                                        <a href="{{ route('profile') }}" >{{ __('Profile') }} </a>
                                         <a href="{{ route('logout') }}"
                                             onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                                             {{ __('Logout') }}
@@ -62,6 +63,7 @@
                                             style="display: none;">
                                             @csrf
                                         </form>
+
                                     </li>
                                 </ul>
                             </li>
@@ -71,7 +73,7 @@
             </div>
         </nav>
 
-        <main class="py-4">
+        <main class="py-4" id="content">
             @yield('content')
         </main>
 
