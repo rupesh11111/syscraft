@@ -5,11 +5,12 @@ namespace App\Http\Controllers;
 use App\Models\CartItem;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\Transaction;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-
+use Illuminate\Support\Str;
 class OrderController extends Controller
 {
     public function store(Request $request, $id)
@@ -41,9 +42,17 @@ class OrderController extends Controller
 
             $order->total_price = $total;
             $order->save();
+
             OrderItem::insert($order_items);
 
             CartItem::whereCartId($id)->delete();
+
+            Transaction::create([
+                'order_id' => $order->id,
+                'transaction_id' => strtoupper(Str::random(20)),
+                'amount' => $total,
+                'status' => 'Paid',
+            ]);
 
             return response()->json([
                 'status' => true,

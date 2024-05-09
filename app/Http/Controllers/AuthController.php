@@ -21,7 +21,7 @@ class AuthController extends Controller
         if ($auth->role->name == 'admin') {
             return view('adminDashboard');
         }
-        if ($auth->role->name == 'customer') {
+        if (in_array($auth->role->name , ['customer','vendor'])) {
             $data['products'] = Product::paginate(20);
             return view('customerDashboard', $data);
         }

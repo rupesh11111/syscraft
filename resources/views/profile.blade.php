@@ -2,9 +2,9 @@
 @section('content')
     <div class="container mt-5">
         <h1 class="text-center mb-4">User Profile</h1>
-        <div class="card text-center">
+        <div class="card text-center ">
             <div class="card-body">
-                <div class="form-group">
+                <div class="form-group ">
                     <label for="username">Username:</label>
                     <p class="form-control-static"> {{ $user?->username }} </p>
                 </div>
