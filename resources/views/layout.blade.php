@@ -42,7 +42,7 @@
                                 <li><a href="{{ route('register') }}">{{ __('Register') }}</a></li>
                             @endif
                         @else
-                            @if (Auth::user()->role->name == 'customer')
+                            @if (in_array(Auth::user()->role->name, ['customer','vendor']))
                                 <a href="{{ route('cart') }}" id="cartCount">
                                     Cart ({{ config('cart_count') }})
                                 </a>

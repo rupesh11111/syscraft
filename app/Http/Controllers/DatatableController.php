@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\Product;
+use App\Models\Transaction;
 use App\Models\User;
 
 class DatatableController extends Controller
@@ -109,10 +110,10 @@ class DatatableController extends Controller
     public function orders()
     {
         if (request('data')) {
-            $data = Order::select('id', 'name', 'email')->with('user')->get();
+            $data = Order::select('id', 'user_id', 'total_price', 'status')->with('user')->withCount('order_items')->get();
             return datatables()->of($data)->make(true);
         }
-        $data['tableHeadings'] = ['ID', 'Name', 'Email'];
+        $data['tableHeadings'] = ['ID', 'Customer Name', 'Customer Email','Product Count', 'Total Price'];
 
         $data['url'] = 'orders';
         $data['columns'] = json_encode([
@@ -120,13 +121,21 @@ class DatatableController extends Controller
                 "data" => "id",
                 "name" => "id",
             ],
-            [ 
-                "data" => "name",
-                "name" => "name",
+            [
+                "data" => "user.email",
+                "name" => "user.email",
             ],
             [
-                "data" => "email",
-                "name" => "email",
+                "data" => "user.email",
+                "name" => "user.email",
+            ],
+            [
+                "data" => "order_items_count",
+                "name" => "order_items_count",
+            ],
+            [
+                "data" => "total_price",
+                "name" => "total_price",
             ],
         ]);
         return response()->json([
@@ -138,7 +147,7 @@ class DatatableController extends Controller
     public function transactions()
     {
         if (request('data')) {
-            $data = Order::select('id', 'name', 'email')->get();
+            $data = Transaction::select('id','order_id','transaction_id','amount','status')->$_FILES->get();
             return datatables()->of($data)->make(true);
         }
         $data['tableHeadings'] = ['ID', 'Name', 'Email'];

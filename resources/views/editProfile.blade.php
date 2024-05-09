@@ -65,6 +65,7 @@
 @push('script')
     <script>
         $(document).ready(function() {
+      
             $("#registrationForm").submit(function(event) {
                 event.preventDefault();
 
