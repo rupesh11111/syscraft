@@ -26,6 +26,7 @@ class OrderController extends Controller
             $order_items = [];
             $order = Order::create([
                 'user_id' => Auth::id(),
+                'order_id' => strtoupper(Str::random(20)),
                 'status' => true,
                 'total_price' => 0
             ]);

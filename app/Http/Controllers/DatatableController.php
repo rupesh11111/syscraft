@@ -147,10 +147,10 @@ class DatatableController extends Controller
     public function transactions()
     {
         if (request('data')) {
-            $data = Transaction::select('id','order_id','transaction_id','amount','status')->$_FILES->get();
+            $data = Transaction::select('id','order_id','transaction_id','amount','status')->with('order')->get();
             return datatables()->of($data)->make(true);
         }
-        $data['tableHeadings'] = ['ID', 'Name', 'Email'];
+        $data['tableHeadings'] = ['ID', 'Order Id', 'Transaction Id' , 'Amount','Status'];
 
         $data['url'] = 'transactions';
         $data['columns'] = json_encode([
@@ -159,12 +159,20 @@ class DatatableController extends Controller
                 "name" => "id",
             ],
             [
-                "data" => "name",
-                "name" => "name",
+                "data" => "order.order_id",
+                "name" => "order.order_id",
             ],
             [
-                "data" => "Price",
-                "name" => "email",
+                "data" => "transaction_id",
+                "name" => "transaction_id",
+            ],
+            [
+                "data" => "amount",
+                "name" => "amount",
+            ],
+            [
+                "data" => "status",
+                "name" => "status",
             ],
         ]);
         return response()->json([
