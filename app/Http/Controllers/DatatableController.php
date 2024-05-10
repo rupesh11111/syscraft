@@ -19,12 +19,16 @@ class DatatableController extends Controller
         $data['url'] = 'customers';
         $data['heading'] = 'Customer';
         $data['subHeading'] = 'List of all customers';
-        $data['tableHeadings'] = ['ID', 'Name', 'Email'];
+        $data['tableHeadings'] = ['ID', 'Profile Picture', 'Name', 'Email'];
         $data['url'] = 'customers';
         $data['columns'] = json_encode([
             [
                 "data" => "id",
                 "name" => "id",
+            ],
+            [
+                "data" => "profile_picture",
+                "name" => "profile_picture",
             ],
             [
                 "data" => "name",
@@ -50,12 +54,16 @@ class DatatableController extends Controller
         $data['url'] = 'customers';
         $data['heading'] = 'Customer';
         $data['subHeading'] = 'List of all customers';
-        $data['tableHeadings'] = ['ID', 'Name', 'Email'];
+        $data['tableHeadings'] = ['ID', 'Profile Picture', 'Name', 'Email'];
         $data['url'] = 'vendors';
         $data['columns'] = json_encode([
             [
                 "data" => "id",
                 "name" => "id",
+            ],
+            [
+                "data" => "profile_picture",
+                "name" => "profile_picture",
             ],
             [
                 "data" => "name",
@@ -89,7 +97,7 @@ class DatatableController extends Controller
                 "data" => "image",
                 "name" => "image",
                 "render" => function ($data, $type, $full, $meta) {
-                    return 'rupesh';
+                    return "<img src=$data />";
                 }
             ],
             [
@@ -113,7 +121,7 @@ class DatatableController extends Controller
             $data = Order::select('id', 'user_id', 'total_price', 'status')->with('user')->withCount('order_items')->get();
             return datatables()->of($data)->make(true);
         }
-        $data['tableHeadings'] = ['ID', 'Customer Name', 'Customer Email','Product Count', 'Total Price'];
+        $data['tableHeadings'] = ['ID', 'Customer Name', 'Customer Email', 'Product Count', 'Total Price'];
 
         $data['url'] = 'orders';
         $data['columns'] = json_encode([
@@ -147,10 +155,10 @@ class DatatableController extends Controller
     public function transactions()
     {
         if (request('data')) {
-            $data = Transaction::select('id','order_id','transaction_id','amount','status')->with('order')->get();
+            $data = Transaction::select('id', 'order_id', 'transaction_id', 'amount', 'status')->with('order')->get();
             return datatables()->of($data)->make(true);
         }
-        $data['tableHeadings'] = ['ID', 'Order Id', 'Transaction Id' , 'Amount','Status'];
+        $data['tableHeadings'] = ['ID', 'Order Id', 'Transaction Id', 'Amount', 'Status'];
 
         $data['url'] = 'transactions';
         $data['columns'] = json_encode([

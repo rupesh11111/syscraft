@@ -12,15 +12,19 @@
 @push('script')
     <script>
         $(document).ready(function() {
+
+            let columns = [];
+
             $('.list-group-item').on('click', function() {
                 $.ajax({
                     type: "GET",
                     url: $(this).data('link'),
                     success: function(response) {
                         $('.append').html(response.data)
+                        columns = mapColummns($("#ajaxDataTable").data("columns"));
                         mainDataTable();
                     },
-                    error: function (xhr, status, error) {
+                    error: function(xhr, status, error) {
                         toastr.error(xhr.responseJSON.message);
                     }
                 });
@@ -42,7 +46,7 @@
                         },
                     },
                     searchDelay: 350,
-                    columns: $("#ajaxDataTable").data("columns"),
+                    columns: columns,
 
                 });
             }

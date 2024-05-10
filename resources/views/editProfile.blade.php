@@ -143,8 +143,7 @@
 
                     $.ajax({
                         type: "POST",
-                        url: "updateProfile/" +
-                        "{!! $user->id !!}", // Specify your PHP file here to handle registration
+                        url: "updateProfile/" + "{!! $user->id !!}", // Specify your PHP file here to handle registration
                         data: formData,
                         processData: false, // Don't process the files
                         contentType: false, // Set content type to false as FormData will handle it

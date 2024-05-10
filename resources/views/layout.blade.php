@@ -43,7 +43,7 @@
                                 <li><a href="{{ route('register') }}">{{ __('Register') }}</a></li>
                             @endif
                         @else
-                            @if (in_array(Auth::user()->role->name, ['customer','vendor']))
+                            @if (in_array(Auth::user()->role->name, ['customer', 'vendor']))
                                 <a href="{{ route('cart') }}" id="cartCount">
                                     Cart ({{ config('cart_count') }})
                                 </a>
@@ -55,7 +55,7 @@
                                 </a>
                                 <ul class="dropdown-menu" role="menu">
                                     <li>
-                                        <a href="{{ route('profile') }}" >{{ __('Profile') }} </a>
+                                        <a href="{{ route('profile') }}">{{ __('Profile') }} </a>
                                         <a href="{{ route('logout') }}"
                                             onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                                             {{ __('Logout') }}
@@ -84,6 +84,27 @@
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 }
             });
+
+            function isValidHttpUrl(string) {
+                let url;
+                try {
+                    url = new URL(string);
+                } catch (_) {
+                    return false;
+                }
+                return url.protocol === "http:" || url.protocol === "https:";
+            }
+
+            function mapColummns(cols) {
+                return cols.map(function(value) {
+                    if (['image','profile_picture'].includes(value.name)) {
+                        value['render'] = function(data, type, full, meta) {
+                            return `<img src="${data}" style="border-radius: 50%;width: 13%;"/>`;
+                        }
+                    }
+                    return value;
+                })
+            }
         </script>
         @stack('script')
         @stack('style')
