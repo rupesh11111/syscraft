@@ -8,6 +8,8 @@ php artisan generate:key
 
 php artisan migrate --seed
 
+php artisan storage:link
+
 php artisan serve
 
 admin login
