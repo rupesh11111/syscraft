@@ -18,7 +18,7 @@ return new class extends Migration
             $table->float('total_price');
             $table->string('status');
 
-            $table->foreign(['user_id'], 'orders_users_ibfk_4')->references(['id'])->on('users')->onUpdate('CASCADE')->onDelete('set null');
+            $table->foreign(['user_id'], 'orders_users_ibfk_4')->references(['id'])->on('users')->onUpdate('CASCADE')->onDelete('CASCADE');
             $table->timestamps();
         });
     }

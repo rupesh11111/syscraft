@@ -24,9 +24,10 @@ return new class extends Migration
             $table->unsignedBigInteger('role_id')->index('users_roles_id_foreign');
             $table->date('dob')->nullable();
             $table->rememberToken();
+
             $table->timestamps();
 
-            $table->foreign(['role_id'], 'roles_ibfk_4')->references(['id'])->on('roles')->onUpdate('CASCADE')->onDelete('set null');
+            $table->foreign(['role_id'], 'roles_ibfk_4')->references(['id'])->on('roles')->onUpdate('CASCADE')->onDelete('CASCADE');
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {

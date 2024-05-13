@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('user_id'); // (Foreign Key referencing Users Table)
 
-            $table->foreign(['user_id'], 'carts_users_ibfk_4')->references(['id'])->on('users')->onUpdate('CASCADE')->onDelete('set null');
+            $table->foreign(['user_id'], 'carts_users_ibfk_4')->references(['id'])->on('users')->onUpdate('CASCADE')->onDelete('CASCADE');
             
             $table->timestamps();
         });

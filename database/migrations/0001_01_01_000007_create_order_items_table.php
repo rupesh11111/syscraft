@@ -18,8 +18,8 @@ return new class extends Migration
             $table->integer('quantity');
             $table->float('price');
 
-            $table->foreign(['order_id'], 'order_items_orders_ibfk_4')->references(['id'])->on('orders')->onUpdate('CASCADE')->onDelete('set null');
-            $table->foreign(['product_id'], 'order_items_products_ibfk_4')->references(['id'])->on('products')->onUpdate('CASCADE')->onDelete('set null');
+            $table->foreign(['order_id'], 'order_items_orders_ibfk_4')->references(['id'])->on('orders')->onUpdate('CASCADE')->onDelete('CASCADE');
+            $table->foreign(['product_id'], 'order_items_products_ibfk_4')->references(['id'])->on('products')->onUpdate('CASCADE')->onDelete('CASCADE');
 
             $table->timestamps();
         });

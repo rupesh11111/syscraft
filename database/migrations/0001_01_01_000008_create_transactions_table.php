@@ -18,7 +18,7 @@ return new class extends Migration
             $table->float('amount');
             $table->tinyInteger('status')->default(true);
 
-            $table->foreign(['order_id'], 'transactions_orders_ibfk_4')->references(['id'])->on('orders')->onUpdate('CASCADE')->onDelete('set null');
+            $table->foreign(['order_id'], 'transactions_orders_ibfk_4')->references(['id'])->on('orders')->onUpdate('CASCADE')->onDelete('CASCADE');
 
             $table->timestamps();
         });
