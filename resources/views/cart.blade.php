@@ -62,6 +62,10 @@
                 + "<button id='cod' data-link='orders/{!! $cart?->id !!}' class='btn btn-primary'>Cash On Deilvery</button>")
             })
 
+            $('body').on('click','#pay-now', function () {
+                window.location.href = "/stripe";
+            })
+
             $('body').on('click','#cod', function () {
                 $.ajax({
                     type: "POST",
